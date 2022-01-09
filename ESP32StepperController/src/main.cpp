@@ -182,6 +182,7 @@ void setup() {
   Serial.begin(115200);
 
   pinMode(A13,INPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   // Horrible coding to wait for Serial to be available..... endless loop
   while (!Serial);
@@ -211,19 +212,26 @@ void loop() {
   }
 
   if (commandsReceived > 0) {
+    digitalWrite(LED_BUILTIN, HIGH);
+
     Serial.println("Command Action");
 
     // Take the oldest command
     uint16_t stepSize = abs(command);
-    Serial.println(stepSize);
+    Serial.print("Moving motor: ");
+    Serial.println(command);
+
     if (command > 0) {
       myMotor->step(stepSize, FORWARD, INTERLEAVE);
     } else {
       myMotor->step(stepSize, BACKWARD, INTERLEAVE);
     }
 
+    command = 0;
     commandsReceived = 0;
     //commandsReceived--;
+
+    digitalWrite(LED_BUILTIN, LOW);
   }
 
 /*
