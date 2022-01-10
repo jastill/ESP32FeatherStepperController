@@ -140,6 +140,28 @@ void setupServo() {
   myMotor->setSpeed(10);  // 10 rpm
 }
 
+/**
+ * @brief Move the stepper motor the given direction and rotations
+ * 
+ * @param movement 
+ * 
+ * The style of INTERLEAVE can be SINGLE, DOUBLE, INTERLEAVE or MICROSTEP.
+ */
+void moveStepper(uint16_t movement) {
+  Serial.println("Command Action");
+
+  // Take the oldest command
+  uint16_t stepSize = abs(movement);
+  Serial.print("Moving motor: ");
+  Serial.println(command);
+
+  if (command > 0) {
+    myMotor->step(stepSize, FORWARD, INTERLEAVE);
+  } else {
+    myMotor->step(stepSize, BACKWARD, INTERLEAVE);
+  }
+}
+
 /////////////////////////////////////////////////////
 // Arduino Code
 /////////////////////////////////////////////////////
@@ -213,19 +235,7 @@ void loop() {
 
   if (commandsReceived > 0) {
     digitalWrite(LED_BUILTIN, HIGH);
-
-    Serial.println("Command Action");
-
-    // Take the oldest command
-    uint16_t stepSize = abs(command);
-    Serial.print("Moving motor: ");
-    Serial.println(command);
-
-    if (command > 0) {
-      myMotor->step(stepSize, FORWARD, INTERLEAVE);
-    } else {
-      myMotor->step(stepSize, BACKWARD, INTERLEAVE);
-    }
+    moveStepper(command);
 
     command = 0;
     commandsReceived = 0;
@@ -233,22 +243,4 @@ void loop() {
 
     digitalWrite(LED_BUILTIN, LOW);
   }
-
-/*
-  Serial.println("Single coil steps");
-  myMotor->step(100, FORWARD, SINGLE);
-  myMotor->step(100, BACKWARD, SINGLE);
-
-  Serial.println("Double coil steps");
-  myMotor->step(100, FORWARD, DOUBLE);
-  myMotor->step(100, BACKWARD, DOUBLE);
-
-  Serial.println("Interleave coil steps");
-  myMotor->step(100, FORWARD, INTERLEAVE);
-  myMotor->step(100, BACKWARD, INTERLEAVE);
-
-  Serial.println("Microstep steps");
-  myMotor->step(50, FORWARD, MICROSTEP);
-  myMotor->step(50, BACKWARD, MICROSTEP);
-  */
 }
